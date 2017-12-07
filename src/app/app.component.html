@@ -1,13 +1,12 @@
 <!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-</div>
 <nav>
-  <ul>
-    <a routerLink='/trades'>Trades</a>
-    <a routerLink='/holdings'>Holdings</a>
-  </ul>
+
+  <mat-toolbar color='primary'>
+    <mat-toolbar-row>StockMon
+      <span class="app-fill-rem-space"></span>
+      <a mat-button routerLink='/trades'>Trades</a>
+      <a mat-button routerLink='/holdings'>Holdings</a>
+    </mat-toolbar-row>
+  </mat-toolbar>
 </nav>
 <router-outlet></router-outlet>
