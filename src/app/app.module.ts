@@ -3,18 +3,21 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from "@angular/router";
 
 import { AppComponent } from './app.component';
-import { TradesComponent } from './trades/trades.component';
+import { TradesListComponent } from './trades-list/trades-list.component';
+import { HoldingsListComponent } from './holdings-list/holdings-list.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    TradesComponent
+    TradesListComponent,
+    HoldingsListComponent
   ],
   imports: [
     BrowserModule,
     RouterModule.forRoot([
-      { path: 'trades', component: TradesComponent },
+      { path: 'trades', component: TradesListComponent },
+      { path: 'holdings', component: HoldingsListComponent },
       { path: '', redirectTo: 'trades', pathMatch: 'full' }
     ])
   ],
