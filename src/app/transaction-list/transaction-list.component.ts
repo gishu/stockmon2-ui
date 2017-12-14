@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Trade } from '../trade';
 import { MatTableDataSource } from '@angular/material/table';
 import { DataSource } from '@angular/cdk/collections';
@@ -6,38 +6,27 @@ import { StockMonService } from '../stock-mon.service';
 
 import * as _ from 'lodash';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TransactionFormComponent } from '../transaction-form/transaction-form.component';
 
 @Component({
-  selector: 'app-trades-list',
-  templateUrl: './trades-list.component.html',
-  styleUrls: ['./trades-list.component.css'],
-  providers: [StockMonService]
+  selector: 'st2-transaction-list',
+  templateUrl: './transaction-list.component.html',
+  styleUrls: ['./transaction-list.component.css'],
+  entryComponents: [TransactionFormComponent]
 })
-export class TradesListComponent implements OnInit {
-  knownStocks: string[];
-  tradeTypes: { label: string; value: boolean; }[];
-  filteredStocks: string[];
-  trade: Trade;
+export class TransactionListComponent implements OnInit {
   trades: Trade[];
 
   //grid config
   displayedColumns: string[];
   dataSource: MatTableDataSource<any>;
 
+  @ViewChild(TransactionFormComponent)
+  form: TransactionFormComponent;
 
   constructor(private service: StockMonService, private toastService: MatSnackBar) { }
 
   ngOnInit() {
-    this.trade = this.getBlankTrade();
-
-    this.knownStocks = [];
-    this.service.getStockNames().subscribe(
-      stocks => this.knownStocks = stocks,
-      err => console.error('Stocks dropdown ' + err)
-    );
-
-    this.filteredStocks = this.knownStocks.slice();
-    this.tradeTypes = [{ label: 'Buy', value: true }, { label: 'Sale', value: false },]
 
     this.trades = [];
 
@@ -46,22 +35,12 @@ export class TradesListComponent implements OnInit {
 
   }
 
-  onStockChange(searchTerm: string) {
-    searchTerm = searchTerm.toLowerCase();
-    if (searchTerm.length == 0) {
-      this.filteredStocks = this.knownStocks.slice();
-    } else {
-      this.filteredStocks = this.knownStocks.filter(name => name.toLowerCase().includes(searchTerm));
-    }
-  }
-
-  addTrade() {
-    console.log('Added trade')
-
-    this.trades.push(this.trade);
-    this.trade = this.getBlankTrade(this.trade.date);
+  private onTradeAdded(trade) {
+    this.trades.push(trade);
+    this.form.reset();
     this.dataSource = new MatTableDataSource<Trade>(this.trades);
   }
+
   saveTrades() {
     console.log('Saved!');
     let csvForPost = 'Date,Stock,Qty,UnitPrice,Amt,Brokerage,Type,Notes\n';
@@ -79,7 +58,5 @@ export class TradesListComponent implements OnInit {
       })
   }
 
-  getBlankTrade(date?: Date) {
-    return new Trade('', date || new Date(Date.now()), 0, 0, 0, '', true);
-  }
+
 }

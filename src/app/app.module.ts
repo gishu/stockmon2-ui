@@ -20,11 +20,13 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 import { AppComponent } from './app.component';
-import { TradesListComponent } from './trades-list/trades-list.component';
 import { HoldingsListComponent } from './holdings-list/holdings-list.component';
+import { TransactionFormComponent } from './transaction-form/transaction-form.component';
+import { StockMonService } from './stock-mon.service';
+import { TransactionListComponent } from './transaction-list/transaction-list.component';
 
 let appRoutes = [
-  { path: 'trades', component: TradesListComponent },
+  { path: 'trades', component: TransactionListComponent },
   { path: 'holdings', component: HoldingsListComponent },
   { path: '', redirectTo: 'trades', pathMatch: 'full' }
 ];
@@ -32,8 +34,9 @@ let appRoutes = [
 @NgModule({
   declarations: [
     AppComponent,
-    TradesListComponent,
-    HoldingsListComponent
+    TransactionListComponent,
+    HoldingsListComponent,
+    TransactionFormComponent
   ],
   imports: [
     BrowserModule,
@@ -45,7 +48,7 @@ let appRoutes = [
     MatToolbarModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatAutocompleteModule, MatRadioModule,
     MatNativeDateModule, MatDatepickerModule, MatCardModule, MatTableModule, MatSnackBarModule
   ],
-  providers: [],
+  providers: [StockMonService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

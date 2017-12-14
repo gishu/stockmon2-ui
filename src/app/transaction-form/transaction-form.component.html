@@ -1,7 +1,3 @@
-<h3>Trades</h3>
-
-
-
 <mat-card>
 
   <mat-card-header>
@@ -13,7 +9,7 @@
         <div class="form-group col-md-12">
           <label for='typeField'>Type</label>
           <mat-radio-group [(ngModel)]='trade.isBuy' name='isBuy'>
-            <mat-radio-button *ngFor='let type of tradeTypes' [value]='type.value'  class='mannKaRadio'>{{type.label}}</mat-radio-button>
+            <mat-radio-button *ngFor='let type of tradeTypes' [value]='type.value' class='mannKaRadio'>{{type.label}}</mat-radio-button>
           </mat-radio-group>
 
         </div>
@@ -26,7 +22,7 @@
 
           <mat-form-field>
             <input id='stockField' class='form-control' matInput required type="text" placeholder="kya liya" [matAutocomplete]='stockAuto'
-              [(ngModel)]='trade.stock' (ngModelChange)='onStockChange($event)' name='stock' #stockModel='ngModel'>
+              [(ngModel)]='trade.stock' (ngModelChange)='updateStocksDropdown($event)' name='stock' #stockModel='ngModel'>
             <mat-autocomplete #stockAuto='matAutocomplete'>
               <mat-option *ngFor='let stock of filteredStocks' [value]='stock'>{{stock}}</mat-option>
             </mat-autocomplete>
@@ -101,46 +97,3 @@
   </mat-card-content>
 
 </mat-card>
-
-<mat-table [dataSource]='dataSource' #table>
-  <ng-container matColumnDef="type">
-    <mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
-    <mat-cell *matCellDef="let trade"> {{trade.isBuy ? 'B' : 'S'}} </mat-cell>
-  </ng-container>
-
-  <ng-container matColumnDef="date">
-    <mat-header-cell *matHeaderCellDef> Date </mat-header-cell>
-    <mat-cell *matCellDef="let trade"> {{trade.date | date:mediumDate}} </mat-cell>
-  </ng-container>
-
-  <ng-container matColumnDef="stock">
-    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-    <mat-cell *matCellDef="let trade"> {{trade.stock}} </mat-cell>
-  </ng-container>
-
-  <ng-container matColumnDef="qty">
-    <mat-header-cell *matHeaderCellDef> Qty </mat-header-cell>
-    <mat-cell *matCellDef="let trade"> {{trade.qty}} </mat-cell>
-  </ng-container>
-
-  <ng-container matColumnDef="price">
-    <mat-header-cell *matHeaderCellDef> Price </mat-header-cell>
-    <mat-cell *matCellDef="let trade"> {{trade.price | number:'1.2'}} </mat-cell>
-  </ng-container>
-
-  <ng-container matColumnDef="brokerage">
-    <mat-header-cell *matHeaderCellDef> Brok. </mat-header-cell>
-    <mat-cell *matCellDef="let trade"> {{trade.brokerage | number:'1.2'}} </mat-cell>
-  </ng-container>
-
-  <ng-container matColumnDef="amount">
-    <mat-header-cell *matHeaderCellDef> Amount </mat-header-cell>
-    <mat-cell *matCellDef="let trade"> {{trade.amount() | number:'1.2'}} </mat-cell>
-  </ng-container>
-
-
-  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-  <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-</mat-table>
-
-<button mat-raised-button color='primary' (click)='saveTrades()'>Save</button>
