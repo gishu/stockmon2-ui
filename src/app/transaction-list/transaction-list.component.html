@@ -1,11 +1,11 @@
-
-<st2-transaction-form (tradeAdded)='onTradeAdded($event)'></st2-transaction-form>
+<st2-transaction-form (tradeAdded)='onTradeAdded($event)'>
+</st2-transaction-form>
 
 
 <mat-table [dataSource]='dataSource' #table>
   <ng-container matColumnDef="type">
     <mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
-    <mat-cell *matCellDef="let trade"> {{trade.isBuy ? 'B' : 'S'}} </mat-cell>
+    <mat-cell *matCellDef="let trade"> {{trade.type}} </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="date">
@@ -35,7 +35,7 @@
 
   <ng-container matColumnDef="amount">
     <mat-header-cell *matHeaderCellDef> Amount </mat-header-cell>
-    <mat-cell *matCellDef="let trade"> {{trade.amount() | number:'1.2'}} </mat-cell>
+    <mat-cell *matCellDef="let trade"> {{ trade.amount | number:'1.2'}} </mat-cell>
   </ng-container>
 
 

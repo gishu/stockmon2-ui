@@ -1,90 +1,122 @@
 <mat-card>
 
   <mat-card-header>
-    <mat-card-title class='text-info'>Enter new trades</mat-card-title>
+    <mat-card-title class='text-info'>
+      <h3>Enter the transaction</h3>
+    </mat-card-title>
   </mat-card-header>
   <mat-card-content>
+
     <form novalidate #tradeForm='ngForm' (ngSubmit)='addTrade()'>
-      <div class="form-row">
-        <div class="form-group col-md-12">
-          <label for='typeField'>Type</label>
-          <mat-radio-group [(ngModel)]='trade.isBuy' name='isBuy'>
-            <mat-radio-button *ngFor='let type of tradeTypes' [value]='type.value' class='mannKaRadio'>{{type.label}}</mat-radio-button>
-          </mat-radio-group>
-
-        </div>
-      </div>
-
-      <div class='form-row'>
-
-        <div class="form-group col-md-6">
-          <label for='stockField'>Stock</label>
-
-          <mat-form-field>
-            <input id='stockField' class='form-control' matInput required type="text" placeholder="kya liya" [matAutocomplete]='stockAuto'
-              [(ngModel)]='trade.stock' (ngModelChange)='updateStocksDropdown($event)' name='stock' #stockModel='ngModel'>
-            <mat-autocomplete #stockAuto='matAutocomplete'>
-              <mat-option *ngFor='let stock of filteredStocks' [value]='stock'>{{stock}}</mat-option>
-            </mat-autocomplete>
-            <mat-error *ngIf='!stockModel.valid'>Stock name is required</mat-error>
-          </mat-form-field>
-
-        </div>
-        <div class="form-group col-md-6">
-          <label for='dateField'>Date</label>
-
-          <mat-form-field>
-            <input matInput id='dateField' class='form-control' [matDatepicker]="picker" placeholder="kab liya" [(ngModel)]='trade.date'
-              name='date'>
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker [startAt]="trade.date" touchUi='true'></mat-datepicker>
-          </mat-form-field>
-
-        </div>
-      </div>
 
 
-      <div class="form-row">
-        <div class="form-group col-md-4">
-          <label for="qtyField">Quantity</label>
-          <mat-form-field class='st3-num-field'>
-            <input matInput id='qtyField' type="number" class="form-control" [(ngModel)]='trade.qty' name='qty'>
-          </mat-form-field>
-        </div>
+      <mat-button-toggle-group #group='matButtonToggleGroup' [(ngModel)]='type' name='type' (ngModelChange)='onTypeChanged($event)'>
+        <mat-button-toggle value='B'>
+          <div class='toolbutton'>
+            <mat-icon>add box</mat-icon>
+            <span>Buy</span>
+          </div>
+        </mat-button-toggle>
+        <mat-button-toggle value='S'>
+          <div class='toolbutton'>
+            <mat-icon>remove box</mat-icon>
+            <span>Sell</span>
+          </div>
+        </mat-button-toggle>
+        <mat-button-toggle value='D'>
+          <div class='toolbutton'>
+            <mat-icon>stars</mat-icon>
+            <span>Div</span>
+          </div>
 
-        <div class="form-group col-md-4">
-          <label for="priceField">Price</label>
-          <mat-form-field class='st3-num-field'>
-            <input matInput id='priceField' type="number" class="form-control text-right" [(ngModel)]='trade.price' name='price'>
-          </mat-form-field>
-        </div>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
 
-        <div class="form-group col-md-4 ">
-          <label for="brokerageField">Brokerage</label>
-          <mat-form-field class='st3-num-field'>
-            <input matInput id='brokerageField' type="number" class="form-control text-right" [(ngModel)]='trade.brokerage' name='brokerage'>
-          </mat-form-field>
+
+      <div [ngClass]='highlightBasedOnType()'>
+        <div class='form-row'>
+
+          <div class="form-group col-md-6">
+            <label for='stockField'>Stock</label>
+
+            <mat-form-field>
+              <input id='stockField' class='form-control' matInput required type="text" placeholder="kya liya" [matAutocomplete]='stockAuto'
+                [(ngModel)]='model.stock' (ngModelChange)='updateStocksDropdown($event)' name='stock' #stockModel='ngModel'>
+              <mat-autocomplete #stockAuto='matAutocomplete'>
+                <mat-option *ngFor='let stock of filteredStocks' [value]='stock'>{{stock}}</mat-option>
+              </mat-autocomplete>
+              <mat-error *ngIf='!stockModel.valid'>Stock name is required</mat-error>
+            </mat-form-field>
+
+          </div>
+          <div class="form-group col-md-6">
+            <label for='dateField'>Date</label>
+
+            <mat-form-field>
+              <input matInput id='dateField' class='form-control' [matDatepicker]="picker" placeholder="kab liya" [(ngModel)]='model.date'
+                name='date'>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker [startAt]="model.date" touchUi='true'></mat-datepicker>
+            </mat-form-field>
+
+          </div>
         </div>
 
-      </div>
 
-      <div class="form-row">
-        <div class="form-group col-md-4 ">
-          <label for="amountField">Amount</label>
-          <mat-form-field class='st3-num-field'>
-            <input matInput id='amountField' type="number" class="form-control text-right" [disabled]=true [ngModel]='trade.amount()'
-              name='amount'>
-          </mat-form-field>
+        <div *ngIf='this.type !== "D"'>
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="qtyField">Quantity</label>
+              <mat-form-field class='st3-num-field'>
+                <input matInput id='qtyField' type="number" class="form-control" [(ngModel)]='model.qty' name='qty'>
+              </mat-form-field>
+            </div>
+
+            <div class="form-group col-md-4">
+              <label for="priceField">Price</label>
+              <mat-form-field class='st3-num-field'>
+                <input matInput id='priceField' type="number" class="form-control text-right" [(ngModel)]='model.price' name='price'>
+              </mat-form-field>
+            </div>
+
+            <div class="form-group col-md-4 ">
+              <label for="brokerageField">Brokerage</label>
+              <mat-form-field class='st3-num-field'>
+                <input matInput id='brokerageField' type="number" class="form-control text-right" [(ngModel)]='model.brokerage' name='brokerage'>
+              </mat-form-field>
+            </div>
+
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-4 ">
+              <label for="amountField">Amount</label>
+              <mat-form-field class='st3-num-field'>
+                <input matInput id='amountField' type="number" class="form-control text-right" [disabled]='true' [ngModel]='model.amount()'
+                  name='amount'>
+              </mat-form-field>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group col-md-6">
-          <mat-form-field id='matFormFieldNotes'>
-            <textarea matInput id='notesField' type="text" class="form-control" placeholder='Notes' [(ngModel)]='trade.notes' name='notes'></textarea>
-          </mat-form-field>
-
+        <div *ngIf='this.type === "D"'>
+          <div class="form-row">
+            <div class="form-group col-md-4 ">
+              <label for="amountField">Amount</label>
+              <mat-form-field class='st3-num-field'>
+                <input matInput id='amountField' type="number" class="form-control text-right" [(ngModel)]='model.amount' name='amount'>
+              </mat-form-field>
+            </div>
+          </div>
         </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <mat-form-field id='matFormFieldNotes'>
+              <textarea matInput id='notesField' type="text" class="form-control" placeholder='Notes' [(ngModel)]='model.notes' name='notes'></textarea>
+            </mat-form-field>
+
+          </div>
+        </div>
+
       </div>
 
       <div class="form-row">
@@ -94,6 +126,7 @@
 
       </div>
     </form>
+
   </mat-card-content>
 
 </mat-card>

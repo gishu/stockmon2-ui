@@ -17,6 +17,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
 
 
 import { AppComponent } from './app.component';
@@ -45,8 +47,9 @@ let appRoutes = [
     HttpClientModule,
     NoopAnimationsModule,
 
-    MatToolbarModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatAutocompleteModule, MatRadioModule,
-    MatNativeDateModule, MatDatepickerModule, MatCardModule, MatTableModule, MatSnackBarModule
+    MatToolbarModule, MatButtonModule, MatButtonToggleModule,
+    MatInputModule, MatFormFieldModule, MatAutocompleteModule, MatRadioModule,
+    MatNativeDateModule, MatDatepickerModule, MatCardModule, MatTableModule, MatSnackBarModule, MatIconModule
   ],
   providers: [StockMonService],
   bootstrap: [AppComponent]
