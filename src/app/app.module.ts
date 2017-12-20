@@ -19,6 +19,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 
 import { AppComponent } from './app.component';
@@ -49,7 +50,10 @@ let appRoutes = [
 
     MatToolbarModule, MatButtonModule, MatButtonToggleModule,
     MatInputModule, MatFormFieldModule, MatAutocompleteModule, MatRadioModule,
-    MatNativeDateModule, MatDatepickerModule, MatCardModule, MatTableModule, MatSnackBarModule, MatIconModule
+    MatNativeDateModule, MatDatepickerModule, 
+    MatCardModule,  MatIconModule,
+    MatTableModule,
+    MatSnackBarModule, MatProgressSpinnerModule,
   ],
   providers: [StockMonService],
   bootstrap: [AppComponent]

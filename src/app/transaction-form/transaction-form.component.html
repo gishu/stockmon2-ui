@@ -2,14 +2,12 @@
 
   <mat-card-header>
     <mat-card-title class='text-info'>
-      <h3>Enter the transaction</h3>
+      <h5>Enter the transaction</h5>
     </mat-card-title>
   </mat-card-header>
   <mat-card-content>
 
     <form novalidate #tradeForm='ngForm' (ngSubmit)='addTrade()'>
-
-
       <mat-button-toggle-group #group='matButtonToggleGroup' [(ngModel)]='type' name='type' (ngModelChange)='onTypeChanged($event)'>
         <mat-button-toggle value='B'>
           <div class='toolbutton'>
