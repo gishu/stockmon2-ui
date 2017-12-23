@@ -11,13 +11,16 @@ import { AfterViewInit } from '@angular/core/src/metadata/lifecycle_hooks';
   styleUrls: ['./holdings-list.component.css']
 })
 export class HoldingsListComponent implements OnInit {
+  _hasViewLoaded: boolean = false;
 
+  _holdings: Holding[] = [];
   _holdingsForDisplay: any;
+  
   dataSource: MatTableDataSource<Holding>;
   displayedColumns = ['stock', 'date', 'qty', 'price', 'age', 'cost', 'marketPrice', 'gain', 'gain%', 'roi', 'notes']
 
-  _holdings: Holding[] = [];
-
+  @ViewChild(MatSort) sort : MatSort;
+  
   _isLoading = false;
 
   constructor(private _service: StockMonService) { }
@@ -34,7 +37,7 @@ export class HoldingsListComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    console.log('view init');
+    this._hasViewLoaded = true;
    }
 
   private _updateHoldings(holdings: Holding[]): any {
@@ -86,6 +89,9 @@ export class HoldingsListComponent implements OnInit {
           })
           //TODO: show error indicators on network call failures & turn off load indicators
           this.dataSource = new MatTableDataSource<Holding>(this._holdingsForDisplay)
+          if(this._hasViewLoaded){
+            this.dataSource.sort = this.sort;
+          }
           this._isLoading = false;
         },
         err => console.error(err)

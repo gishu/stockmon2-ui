@@ -19,7 +19,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 import { AppComponent } from './app.component';
@@ -27,11 +27,12 @@ import { HoldingsListComponent } from './holdings-list/holdings-list.component';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 import { StockMonService } from './stock-mon.service';
 import { TransactionListComponent } from './transaction-list/transaction-list.component';
+import { MatSortModule } from '@angular/material/sort';
 
 let appRoutes = [
   { path: 'trades', component: TransactionListComponent },
   { path: 'holdings', component: HoldingsListComponent },
-  { path: '', redirectTo: 'trades', pathMatch: 'full' }
+  { path: '', redirectTo: 'holdings', pathMatch: 'full' }
 ];
 
 @NgModule({
@@ -50,9 +51,9 @@ let appRoutes = [
 
     MatToolbarModule, MatButtonModule, MatButtonToggleModule,
     MatInputModule, MatFormFieldModule, MatAutocompleteModule, MatRadioModule,
-    MatNativeDateModule, MatDatepickerModule, 
-    MatCardModule,  MatIconModule,
-    MatTableModule,
+    MatNativeDateModule, MatDatepickerModule,
+    MatCardModule, MatIconModule,
+    MatTableModule, MatSortModule,
     MatSnackBarModule, MatProgressSpinnerModule,
   ],
   providers: [StockMonService],
