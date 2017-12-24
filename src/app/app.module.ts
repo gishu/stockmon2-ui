@@ -20,7 +20,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
+import { MatSelectModule } from '@angular/material/select';
 
 import { AppComponent } from './app.component';
 import { HoldingsListComponent } from './holdings-list/holdings-list.component';
@@ -50,7 +50,7 @@ let appRoutes = [
     NoopAnimationsModule,
 
     MatToolbarModule, MatButtonModule, MatButtonToggleModule,
-    MatInputModule, MatFormFieldModule, MatAutocompleteModule, MatRadioModule,
+    MatInputModule, MatSelectModule, MatFormFieldModule, MatAutocompleteModule, MatRadioModule,
     MatNativeDateModule, MatDatepickerModule,
     MatCardModule, MatIconModule,
     MatTableModule, MatSortModule,

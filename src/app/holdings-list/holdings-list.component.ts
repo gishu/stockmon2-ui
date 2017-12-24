@@ -4,6 +4,7 @@ import { MatTableDataSource, MatSort, MatTable } from '@angular/material';
 import * as _ from 'lodash';
 import { BigNumber } from 'bignumber.js'
 import { AfterViewInit } from '@angular/core/src/metadata/lifecycle_hooks';
+import { FormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'app-holdings-list',
@@ -11,34 +12,53 @@ import { AfterViewInit } from '@angular/core/src/metadata/lifecycle_hooks';
   styleUrls: ['./holdings-list.component.css']
 })
 export class HoldingsListComponent implements OnInit {
+  summary: any = { total_cost: 0, total_gain: 0 };
   _hasViewLoaded: boolean = false;
 
   _holdings: Holding[] = [];
-  _holdingsForDisplay: any;
-  
+  _holdingsForDisplay: any = [];
+
   dataSource: MatTableDataSource<Holding>;
   displayedColumns = ['stock', 'date', 'qty', 'price', 'age', 'cost', 'marketPrice', 'gain', 'gain%', 'roi', 'notes']
 
-  @ViewChild(MatSort) sort : MatSort;
-  
+  @ViewChild(MatSort) sort: MatSort;
+
   _isLoading = false;
 
-  constructor(private _service: StockMonService) { }
+  _accounts = [
+    { id: 1, name: 'Gishu Hdfc' },
+    { id: 2, name: 'Mushu Hdfc' },
+    { id: 3, name: 'Gishu Zerodha' }];
 
-  ngOnInit() {
-    BigNumber.config({ DECIMAL_PLACES: 2 });
+  constructor(private _service: StockMonService) {
 
+  }
+
+  onAccountChanged(accountId) {
     this._isLoading = true;
-    this._service.getHoldings(3, 2017)
+    this._clearGrid();
+    this._service.getHoldings(accountId, new Date(Date.now()).getFullYear())
       .subscribe(
       result => this._updateHoldings(result),
       error => console.error('Unable to fetch holdings ', error)
       );
   }
 
+  ngOnInit() {
+    BigNumber.config({ DECIMAL_PLACES: 2 });
+
+    this._clearGrid();
+
+  }
+
+  private _clearGrid() {
+    this._holdings = this._holdingsForDisplay = [];
+    this.dataSource = new MatTableDataSource(this._holdingsForDisplay);
+  }
+
   ngAfterViewInit() {
     this._hasViewLoaded = true;
-   }
+  }
 
   private _updateHoldings(holdings: Holding[]): any {
     try {
@@ -87,9 +107,18 @@ export class HoldingsListComponent implements OnInit {
               h.gain_percent = 0;
             }
           })
+
+          this.summary = _.reduce(this._holdingsForDisplay, (result, value) => {
+            if (value.cost) {
+              result.total_cost += parseFloat(value.cost);
+              result.total_gain += parseFloat(value.gain);
+            }
+            return result;
+          }, { total_cost: 0, total_gain: 0 })
+
           //TODO: show error indicators on network call failures & turn off load indicators
           this.dataSource = new MatTableDataSource<Holding>(this._holdingsForDisplay)
-          if(this._hasViewLoaded){
+          if (this._hasViewLoaded) {
             this.dataSource.sort = this.sort;
           }
           this._isLoading = false;
@@ -107,6 +136,15 @@ export class HoldingsListComponent implements OnInit {
     filterValue = filterValue.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
     this.dataSource.filter = filterValue;
+  }
+
+  getRowClasses(row) {
+    let roi = parseFloat(row.roi);
+
+    return {
+      'nafaa': roi > 0.25,
+      'nuksaan': roi < -0.08
+    };
   }
 
 }
