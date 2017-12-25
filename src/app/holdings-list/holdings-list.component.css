@@ -30,8 +30,7 @@
 }
 
 .header{
-    padding: 0 16px;
-    font-size: 18px;
+    padding: 8px 16px 0 16px;
 }
 .grid-summary{
     display: flex;
@@ -55,7 +54,7 @@
   }
 
 .mat-cell{
-    font-size: 12px;
+    font-size: 11px;
     padding: 0 4px;
 }
 /* right align numeric columns */
@@ -78,11 +77,14 @@
 .mat-column-price, .mat-column-marketPrice, .mat-column-gain,  .mat-column-cost{
     flex: 0 0 80px;
 }
-.mat-column-qty, .mat-column-gain-, .mat-column-roi{
-    flex: 0 0 80px;
+.mat-column-qty{
+    flex: 0 0 50px;
+}
+.mat-column-gain-, .mat-column-roi{
+    flex: 0 0 60px;
 }
 .mat-column-notes{
-    flex-grow: 3;
+    flex: 2 0 80px;
 }
 
 mat-row.nuksaan {
@@ -95,3 +97,7 @@ mat-row.nuksaan > mat-cell{
 mat-row.nafaa{
     background-color: rgba(144, 238, 144, 0.24);
 }
+
+::ng-deep   div.mat-form-field-wrapper.mat-input-wrapper{
+    padding-bottom: 16px;
+} 
