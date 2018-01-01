@@ -58,7 +58,7 @@
     padding: 0 4px;
 }
 /* right align numeric columns */
-.mat-cell.mat-column-qty, .mat-cell.mat-column-price, .mat-cell.mat-column-cost, .mat-cell.mat-column-marketPrice, .mat-cell.mat-column-gain, .mat-cell.mat-column-gain-, .mat-cell.mat-column-roi{
+.mat-cell.mat-column-qty, .mat-cell.mat-column-price, .mat-cell.mat-column-cost, .mat-cell.mat-column-marketPrice, .mat-cell.mat-column-gain, .mat-cell.mat-column-gainPc, .mat-cell.mat-column-roi{
     text-align: right;
 }
 
@@ -80,7 +80,7 @@
 .mat-column-qty{
     flex: 0 0 50px;
 }
-.mat-column-gain-, .mat-column-roi{
+.mat-column-gainPc, .mat-column-roi{
     flex: 0 0 60px;
 }
 .mat-column-notes{

@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import { BigNumber } from 'bignumber.js'
 import { AfterViewInit } from '@angular/core/src/metadata/lifecycle_hooks';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { asPercent, asCurrency } from '../utilities'
 
 @Component({
   selector: 'app-holdings-list',
@@ -23,10 +24,10 @@ export class HoldingsListComponent implements OnInit {
   _quotes: any;
   _holdingsForDisplay: any = [];
   summary: any = { total_cost: 0, total_gain: 0 };
-  
+
   dataSource: MatTableDataSource<Holding>;
-  displayedColumns = ['stock', 'date', 'qty', 'price', 'age', 'cost', 'marketPrice', 'gain', 'gain%', 'roi', 'notes']
-  
+  displayedColumns = ['stock', 'date', 'qty', 'price', 'age', 'marketPrice', 'cost', 'gain', 'gainPc', 'roi', 'notes']
+
   @ViewChild(MatSort) sort: MatSort;
 
   accounts = [
@@ -46,7 +47,7 @@ export class HoldingsListComponent implements OnInit {
 
 
   ngOnInit() {
-    BigNumber.config({ DECIMAL_PLACES: 2 });
+    BigNumber.config({ DECIMAL_PLACES: 5 });
 
     this._clearGrid();
 
@@ -111,17 +112,18 @@ export class HoldingsListComponent implements OnInit {
                   price: new BigNumber(result.price).times(result.qty)
                     .plus(new BigNumber(value.price).times(value.qty))
                     .div(result.qty + value.qty)
-                    .toFixed(2)
+                    .toFixed(2),
+                    age_months: Math.max(result.age_months, value.age_months)
                 };
               },
-              { qty: 0, price: '0' })
+              { qty: 0, price: '0', age_months: 0 })
             return {
               stock: entries[0].stock,
               date: entries[0].date,
               qty: reduction.qty,
               price: reduction.price,
-              age: '',
-              ageInYears: 0,
+              age: getAgeBin(reduction.age_months),
+              ageInYears: (reduction.age_months / 12).toFixed(2),
               notes: ''
             }
           })
@@ -136,7 +138,6 @@ export class HoldingsListComponent implements OnInit {
             date: h.date,
             qty: h.qty,
             price: h.price,
-            price_f: h.price.toString(),
             age: getAgeBin(h.age_months),
             ageInYears: (h.age_months / 12).toFixed(2),
             notes: h.notes
@@ -154,29 +155,29 @@ export class HoldingsListComponent implements OnInit {
         return;
       }
 
-      h.cost = new BigNumber(h.price).times(h.qty).div(1000).toFixed(2);
-      h.gain = new BigNumber(quote.p).minus(h.price).times(h.qty).div(1000).toFixed(2);
-      h.market_price = quote.p.toFixed(2);
-      h.change = quote.c.toFixed(2);
+      h.cost = asCurrency(new BigNumber(h.price).times(h.qty).div(1000));
+      h.gain = asCurrency(new BigNumber(quote.p).minus(h.price).times(h.qty).div(1000));
+      h.market_price = asCurrency(quote.p);
+      h.change = asCurrency(quote.c);
+
+      h.roi = 5;
+      h.gain_percent = 5;
+      if (h.price > 0) {
+        h.gain_percent = asPercent(new BigNumber(quote.p).minus(h.price).div(h.price));
+      }
 
       if ((h.price > 0) && (h.ageInYears > 0)) {
-        h.gain_percent = new BigNumber(quote.p).minus(h.price).div(h.price).toFixed(2);
+        let cagr = this.getCagr(quote.p, h.price, h.ageInYears);
+        let simpleRate = new BigNumber(quote.p).minus(h.price).div(h.price).div(h.ageInYears);
+        h.roi = asPercent((h.age_months < 12) ? simpleRate : cagr);
+      }
 
-        let cagr = Math.pow(new BigNumber(quote.p).div(h.price).toNumber(), (1 / h.ageInYears)) - 1;
-        let simpleRate = new BigNumber(quote.p).minus(h.price).div(h.price).div(h.ageInYears).toFixed(2)
-        h.roi = (h.age_months < 12) ? simpleRate : cagr;
-      }
-      else {
-        h.roi = 0;
-        h.gain_percent = 0;
-      }
     })
 
     this.summary = _.reduce(this._holdingsForDisplay, (result, value) => {
-      if (value.cost) {
-        result.total_cost += parseFloat(value.cost);
-        result.total_gain += parseFloat(value.gain);
-      }
+      result.total_cost += parseFloat(value.cost);
+      result.total_gain += parseFloat(value.gain);
+
       return result;
     }, { total_cost: 0, total_gain: 0 })
 
@@ -189,7 +190,7 @@ export class HoldingsListComponent implements OnInit {
 
     this.applyFilter(this.formModel.value.filter);
   }
-  
+
   applyFilter(filterValue: string) {
     filterValue = filterValue.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
@@ -205,6 +206,10 @@ export class HoldingsListComponent implements OnInit {
     };
   }
 
+  getCagr(curPrice, costPrice, ageInYears) {
+    let cagr = Math.pow(new BigNumber(curPrice).div(costPrice).toNumber(), (1 / ageInYears)) - 1;
+    return new BigNumber(cagr.toPrecision(10));
+  }
 }
 export function getAgeBin(age_months) {
   if (age_months < 12) {
@@ -212,5 +217,6 @@ export function getAgeBin(age_months) {
   } else {
     return "";
   }
-
 }
+
+

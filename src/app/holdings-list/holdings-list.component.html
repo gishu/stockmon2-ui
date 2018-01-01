@@ -23,15 +23,13 @@
       </mat-form-field>
 
       <div> TCO:
-        <span>{{summary.total_cost| number:'1.2' }} K</span>
+        <span>{{summary.total_cost| number:'1.2-2' }} K</span>
         Gain:
-        <span>{{summary.total_gain | number:'1.2'}} K</span>
+        <span>{{summary.total_gain | number:'1.2-2'}} K</span>
         Margin:
-        <span>{{(summary.total_gain / summary.total_cost) | percent:'1.2'}}</span>
+        <span>{{(summary.total_gain / summary.total_cost) | percent:'1.2-2'}}</span>
       </div>
     </div>
-    {{formModel.value | json }}
-
   </form>
 
   <div class="content">
@@ -53,11 +51,11 @@
 
       <ng-container matColumnDef="price">
         <mat-header-cell *matHeaderCellDef> Price </mat-header-cell>
-        <mat-cell *matCellDef="let holding"> {{holding.price | number:'1.2'}} </mat-cell>
+        <mat-cell *matCellDef="let holding"> {{holding.price | number:'1.2-2'}} </mat-cell>
       </ng-container>
       <ng-container matColumnDef="cost">
-        <mat-header-cell *matHeaderCellDef> TCO </mat-header-cell>
-        <mat-cell *matCellDef="let holding"> {{holding.cost | number:'1.2'}} </mat-cell>
+        <mat-header-cell *matHeaderCellDef mat-sort-header> TCO </mat-header-cell>
+        <mat-cell *matCellDef="let holding"> {{holding.cost | number:'1.2-2'}} </mat-cell>
       </ng-container>
       <ng-container matColumnDef="age">
         <mat-header-cell *matHeaderCellDef> Age </mat-header-cell>
@@ -65,20 +63,20 @@
       </ng-container>
       <ng-container matColumnDef="marketPrice">
         <mat-header-cell *matHeaderCellDef> CMP </mat-header-cell>
-        <mat-cell *matCellDef="let holding"> {{holding.market_price | number:'1.2'}} </mat-cell>
+        <mat-cell *matCellDef="let holding"> {{holding.market_price | number:'1.2-2'}} </mat-cell>
       </ng-container>
       <ng-container matColumnDef="gain">
         <mat-header-cell *matHeaderCellDef mat-sort-header> Gain </mat-header-cell>
-        <mat-cell *matCellDef="let holding"> {{holding.gain | number:'1.2'}} </mat-cell>
+        <mat-cell *matCellDef="let holding"> {{holding.gain | number:'1.2-2'}} </mat-cell>
       </ng-container>
 
-      <ng-container matColumnDef="gain%">
-        <mat-header-cell *matHeaderCellDef mat-sort-header> % </mat-header-cell>
-        <mat-cell *matCellDef="let holding"> {{holding.gain_percent | percent:'1.2'}} </mat-cell>
+      <ng-container matColumnDef="gainPc">
+        <mat-header-cell *matHeaderCellDef> pc </mat-header-cell>
+        <mat-cell *matCellDef="let holding"> {{holding.gain_percent | percent:'1.2-2'}} </mat-cell>
       </ng-container>
       <ng-container matColumnDef="roi">
         <mat-header-cell *matHeaderCellDef mat-sort-header> cagr </mat-header-cell>
-        <mat-cell *matCellDef="let holding"> {{holding.roi | percent :'1.2'}} </mat-cell>
+        <mat-cell *matCellDef="let holding"> {{holding.roi | percent :'1.2-2'}} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="notes">
