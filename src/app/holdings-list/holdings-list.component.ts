@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { StockMonService, Holding } from '../stock-mon.service';
-import { MatTableDataSource, MatSort, MatTable } from '@angular/material';
+import { MatTableDataSource, MatSort, MatTable, MatSnackBar } from '@angular/material';
 import * as _ from 'lodash';
 import { BigNumber } from 'bignumber.js'
 import { AfterViewInit } from '@angular/core/src/metadata/lifecycle_hooks';
@@ -35,7 +35,7 @@ export class HoldingsListComponent implements OnInit {
     { id: 2, name: 'Mushu Hdfc' },
     { id: 3, name: 'Gishu Zerodha' }];
 
-  constructor(private _service: StockMonService, private _builder: FormBuilder) {
+  constructor(private _service: StockMonService, private _builder: FormBuilder, private toastService: MatSnackBar) {
     this.formModel = _builder.group({
       accountId: 3,
       filter: '',
@@ -79,11 +79,12 @@ export class HoldingsListComponent implements OnInit {
   }
 
   onAccountChanged(accountId) {
-    console.log('acc change!')
+    let currentFinYear = this._currentFinYear();
+
     this._isLoading = true;
     this._clearGrid();
 
-    this._service.getHoldings(accountId, new Date(Date.now()).getFullYear())
+    this._service.getHoldings(accountId, currentFinYear)
       .subscribe(
       holdings => {
         let symbols = _(holdings).map(h => h.stock).uniq().value();
@@ -94,7 +95,12 @@ export class HoldingsListComponent implements OnInit {
             this.prepareGrid();
           });
       },
-      error => console.error('Unable to fetch holdings ', error)
+      error => {
+        console.error('Unable to fetch holdings ', error);
+
+        this._isLoading = false;
+        this.toastService.open('Unable to fetch holdings for ' + currentFinYear, 'OK', { duration: 2000 })
+      }
       );
   }
 
@@ -113,7 +119,7 @@ export class HoldingsListComponent implements OnInit {
                     .plus(new BigNumber(value.price).times(value.qty))
                     .div(result.qty + value.qty)
                     .toFixed(2),
-                    age_months: Math.max(result.age_months, value.age_months)
+                  age_months: Math.max(result.age_months, value.age_months)
                 };
               },
               { qty: 0, price: '0', age_months: 0 })
@@ -167,7 +173,7 @@ export class HoldingsListComponent implements OnInit {
       }
 
       if ((h.price > 0) && (h.ageInYears > 0)) {
-        let cagr = this.getCagr(quote.p, h.price, h.ageInYears);
+        let cagr = this._getCagr(quote.p, h.price, h.ageInYears);
         let simpleRate = new BigNumber(quote.p).minus(h.price).div(h.price).div(h.ageInYears);
         h.roi = asPercent((h.age_months < 12) ? simpleRate : cagr);
       }
@@ -175,11 +181,16 @@ export class HoldingsListComponent implements OnInit {
     })
 
     this.summary = _.reduce(this._holdingsForDisplay, (result, value) => {
-      result.total_cost += parseFloat(value.cost);
-      result.total_gain += parseFloat(value.gain);
+      // exclude things that we do not have a quote for like bonds
+      if (value.market_price) {
+        result.total_cost += parseFloat(value.cost);
+        result.total_gain += parseFloat(value.gain);
+      }
 
       return result;
     }, { total_cost: 0, total_gain: 0 })
+
+    console.log(this.summary);
 
     //TODO: show error indicators on network call failures & turn off load indicators
     this.dataSource = new MatTableDataSource<Holding>(this._holdingsForDisplay)
@@ -198,18 +209,22 @@ export class HoldingsListComponent implements OnInit {
   }
 
   getRowClasses(row) {
-    let roi = parseFloat(row.roi);
-
     return {
-      'nafaa': roi > 0.25,
-      'nuksaan': roi < -0.08
+      'nafaa': (row.roi > 0.25) && (row.ageInYears > 0),
+      'nuksaan': row.gain_percent < -0.08
     };
   }
 
-  getCagr(curPrice, costPrice, ageInYears) {
+  private _getCagr(curPrice, costPrice, ageInYears) {
     let cagr = Math.pow(new BigNumber(curPrice).div(costPrice).toNumber(), (1 / ageInYears)) - 1;
     return new BigNumber(cagr.toPrecision(10));
   }
+  private _currentFinYear(): number {
+    let today = new Date(Date.now());
+    let firstOfApril = Date.UTC(today.getFullYear(), 3, 1, 0, 0, 0, 0);
+    return (firstOfApril.valueOf() < today.valueOf()) ? today.getFullYear() : today.getFullYear() - 1;
+  }
+
 }
 export function getAgeBin(age_months) {
   if (age_months < 12) {
