@@ -1,0 +1,32 @@
+/* right align numeric columns */
+.mat-cell.mat-column-qty, .mat-cell.mat-column-salePrice, .mat-cell.mat-column-costPrice, .mat-cell.mat-column-tco, .mat-cell.mat-column-gain, .mat-cell.mat-column-period, .mat-cell.mat-column-roi{
+    text-align: right;
+}
+
+.mat-cell.mat-column-taxable{
+    text-align: center;
+}
+
+/* width */
+.mat-column-stock{
+    flex: 1 0 80px;
+}
+.mat-column-date{
+    flex: 0 0 90px;
+}
+
+.mat-table {
+    flex: 1 0 auto;
+}
+
+/* summary card header */
+.mat-card{
+    padding: 0;
+}
+.mat-card-header{
+    display: flex;
+    padding: 8px;
+}
+.spacer{
+    flex: 1 0 auto;
+}

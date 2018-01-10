@@ -21,6 +21,8 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatChipsModule } from '@angular/material/chips';
 
 import { AppComponent } from './app.component';
 import { HoldingsListComponent } from './holdings-list/holdings-list.component';
@@ -28,11 +30,14 @@ import { TransactionFormComponent } from './transaction-form/transaction-form.co
 import { StockMonService } from './stock-mon.service';
 import { TransactionListComponent } from './transaction-list/transaction-list.component';
 import { MatSortModule } from '@angular/material/sort';
+import { ReviewComponent } from './review/review.component';
+import { GainsListComponent } from './gains-list/gains-list.component';
+
 
 let appRoutes = [
   { path: 'trades', component: TransactionListComponent },
-  { path: 'holdings', component: HoldingsListComponent },
-  { path: '', redirectTo: 'holdings', pathMatch: 'full' }
+  { path: 'review', component: ReviewComponent },
+  { path: '', redirectTo: 'review', pathMatch: 'full' }
 ];
 
 @NgModule({
@@ -40,7 +45,9 @@ let appRoutes = [
     AppComponent,
     TransactionListComponent,
     HoldingsListComponent,
-    TransactionFormComponent
+    TransactionFormComponent,
+    ReviewComponent,
+    GainsListComponent
   ],
   imports: [
     BrowserModule,
@@ -52,9 +59,9 @@ let appRoutes = [
     MatToolbarModule, MatButtonModule, MatButtonToggleModule,
     MatInputModule, MatSelectModule, MatFormFieldModule, MatAutocompleteModule, MatRadioModule,
     MatNativeDateModule, MatDatepickerModule,
-    MatCardModule, MatIconModule,
+    MatCardModule, MatIconModule, MatTabsModule,
     MatTableModule, MatSortModule,
-    MatSnackBarModule, MatProgressSpinnerModule,
+    MatSnackBarModule, MatProgressSpinnerModule, MatChipsModule
   ],
   providers: [StockMonService],
   bootstrap: [AppComponent]

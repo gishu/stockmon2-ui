@@ -11,52 +11,6 @@
     justify-content: center; 
 }
 
-.holdings-container{
-    display: flex;
-    flex-direction: column;
-    min-width: 300px;
-    
-}
-
-/* center grid headers */
-.mat-header-cell{
-    text-align: center;
-    color: #0000ff;
-}
-::ng-deep button.mat-sort-header-button{
-    text-align: center;
-    flex-grow: 1;
-    display: block;
-}
-
-.header{
-    padding: 8px 16px 0 16px;
-}
-.grid-summary{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-}
-.grid-summary span{
-    font-style: oblique;
-    color: blue;
-}
-.content{
-    padding: 8px 16px;
-}
-
-.mat-row{
-    min-height: 32px;
-}
-.mat-header-cell.mat-sort-header-sorted {
-    color: black;
-  }
-
-.mat-cell{
-    font-size: 11px;
-    padding: 0 4px;
-}
 /* right align numeric columns */
 .mat-cell.mat-column-qty, .mat-cell.mat-column-price, .mat-cell.mat-column-cost, .mat-cell.mat-column-marketPrice, .mat-cell.mat-column-gain, .mat-cell.mat-column-gainPc, .mat-cell.mat-column-roi{
     text-align: right;
@@ -98,6 +52,15 @@ mat-row.nafaa{
     background-color: rgba(144, 238, 144, 0.24);
 }
 
-::ng-deep   div.mat-form-field-wrapper.mat-input-wrapper{
-    padding-bottom: 16px;
-} 
+
+/* summary card header */
+.mat-card{
+    padding: 0;
+}
+.mat-card-header{
+    display: flex;
+    padding: 8px;
+}
+.spacer{
+    flex: 1 0 auto;
+}

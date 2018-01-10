@@ -1,0 +1,47 @@
+.st2-container{
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+}
+
+.header{
+    flex: 0 0 auto;
+}
+.content{
+    flex: 1 0 400px;
+}
+
+.tab-content{
+    padding: 16px;
+    display:flex;
+    flex-direction: column
+ }
+ 
+/* center grid headers */
+::ng-deep .mat-header-row{
+    background-color:beige;
+}
+::ng-deep .mat-header-cell{
+    text-align: center;
+    color: #0000ff;
+}
+::ng-deep button.mat-sort-header-button{
+    text-align: center;
+    flex-grow: 1;
+    display: block;
+}
+/*grid*/
+
+::ng-deep .mat-cell{
+    font-size: 11px;
+    padding: 0 4px;
+}
+
+::ng-deep .mat-row.spec-row{
+    min-height: 24px;
+}
+::ng-deep .mat-header-cell.mat-sort-header-sorted {
+    color: black;
+}
+
+

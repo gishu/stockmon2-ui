@@ -6,85 +6,25 @@ import { BigNumber } from 'bignumber.js'
 import { AfterViewInit } from '@angular/core/src/metadata/lifecycle_hooks';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { asPercent, asCurrency } from '../utilities'
+import { GridBase } from '../grid-base';
 
 @Component({
-  selector: 'app-holdings-list',
+  selector: 'st2-holdings-list',
   templateUrl: './holdings-list.component.html',
   styleUrls: ['./holdings-list.component.css']
 })
-export class HoldingsListComponent implements OnInit {
-
-  formModel: FormGroup;
-  groupClauses = ['None', 'Stock', 'Month'];
-
-  _hasViewLoaded: boolean = false;
-  _isLoading = false;
-
+export class HoldingsListComponent extends GridBase {
   _holdings: Holding[] = [];
   _quotes: any;
-  _holdingsForDisplay: any = [];
+
   summary: any = { total_cost: 0, total_gain: 0 };
 
-  dataSource: MatTableDataSource<Holding>;
-  displayedColumns = ['stock', 'date', 'qty', 'price', 'age', 'marketPrice', 'cost', 'gain', 'gainPc', 'roi', 'notes']
-
-  @ViewChild(MatSort) sort: MatSort;
-
-  accounts = [
-    { id: 1, name: 'Gishu Hdfc' },
-    { id: 2, name: 'Mushu Hdfc' },
-    { id: 3, name: 'Gishu Zerodha' }];
-
-  constructor(private _service: StockMonService, private _builder: FormBuilder, private toastService: MatSnackBar) {
-    this.formModel = _builder.group({
-      accountId: 3,
-      filter: '',
-      group: 'None'
-    });
-
-
+  constructor(private _service: StockMonService) {
+    super();
   }
 
-
-  ngOnInit() {
-    BigNumber.config({ DECIMAL_PLACES: 5 });
-
-    this._clearGrid();
-
-    this.formModel.get('accountId').valueChanges.subscribe(
-      newAccountId => this.onAccountChanged(newAccountId)
-    );
-    this.formModel.get('filter').valueChanges.subscribe(
-      filterString => this.applyFilter(filterString)
-    );
-    this.formModel.get('group').valueChanges.subscribe(
-      grouping => this.onGroupChanged(grouping)
-    );
-
-    this.onAccountChanged(this.formModel.value.accountId);
-  }
-
-  private _clearGrid() {
-    this._holdings = this._holdingsForDisplay = [];
-    this.dataSource = new MatTableDataSource(this._holdingsForDisplay);
-  }
-
-  ngAfterViewInit() {
-    this._hasViewLoaded = true;
-  }
-
-
-  onGroupChanged(event) {
-    this.prepareGrid();
-  }
-
-  onAccountChanged(accountId) {
-    let currentFinYear = this._currentFinYear();
-
-    this._isLoading = true;
-    this._clearGrid();
-
-    this._service.getHoldings(accountId, currentFinYear)
+  fetch(): void {
+    this._service.getHoldings(this._accountId, this._currentFinYear)
       .subscribe(
       holdings => {
         let symbols = _(holdings).map(h => h.stock).uniq().value();
@@ -92,24 +32,20 @@ export class HoldingsListComponent implements OnInit {
           response => {
             this._holdings = holdings;
             this._quotes = response.data;
-            this.prepareGrid();
+            this._renderGrid();
           });
       },
       error => {
         console.error('Unable to fetch holdings ', error);
-
-        this._isLoading = false;
-        this.toastService.open('Unable to fetch holdings for ' + currentFinYear, 'OK', { duration: 2000 })
-      }
-      );
+      });
   }
 
-  prepareGrid(): void {
-    switch (this.formModel.value.group) {
+  groupItems(): void {
+    switch (this._groupBy) {
 
       case 'Stock':
         let groupsObject = _.groupBy(this._holdings, h => h.stock);
-        this._holdingsForDisplay = _(_.values(groupsObject))
+        this._gridData = _(_.values(groupsObject))
           .map(entries => {
             let reduction = _.reduce(entries,
               (result, value) => {
@@ -119,26 +55,22 @@ export class HoldingsListComponent implements OnInit {
                     .plus(new BigNumber(value.price).times(value.qty))
                     .div(result.qty + value.qty)
                     .toFixed(2),
-                  age_months: Math.max(result.age_months, value.age_months)
                 };
               },
-              { qty: 0, price: '0', age_months: 0 })
+              { qty: 0, price: '0' })
             return {
               stock: entries[0].stock,
-              date: entries[0].date,
               qty: reduction.qty,
               price: reduction.price,
-              age: getAgeBin(reduction.age_months),
-              ageInYears: (reduction.age_months / 12).toFixed(2),
-              notes: ''
+              ageInYears: 0
             }
           })
           .value();
-
+        this.displayedColumns = ['stock', 'qty', 'price', 'marketPrice', 'cost', 'gain', 'gainPc']
         break;
       default:
 
-        this._holdingsForDisplay = _.map(this._holdings, function (h) {
+        this._gridData = _.map(this._holdings, function (h) {
           return {
             stock: h.stock,
             date: h.date,
@@ -150,11 +82,12 @@ export class HoldingsListComponent implements OnInit {
           };
         });
 
+        this.displayedColumns = ['stock', 'date', 'qty', 'price', 'age', 'marketPrice', 'cost', 'gain', 'gainPc', 'roi', 'notes']
 
 
         break;
     }
-    _.each(this._holdingsForDisplay, h => {
+    _.each(this._gridData, h => {
       let quote = this._quotes[h.stock];
       if (!quote) {
         console.error('Cannot retrieve quote for ' + h.stock);
@@ -166,8 +99,8 @@ export class HoldingsListComponent implements OnInit {
       h.market_price = asCurrency(quote.p);
       h.change = asCurrency(quote.c);
 
-      h.roi = 5;
-      h.gain_percent = 5;
+      h.roi = 0;
+      h.gain_percent = 0;
       if (h.price > 0) {
         h.gain_percent = asPercent(new BigNumber(quote.p).minus(h.price).div(h.price));
       }
@@ -179,8 +112,13 @@ export class HoldingsListComponent implements OnInit {
       }
 
     })
+  }
 
-    this.summary = _.reduce(this._holdingsForDisplay, (result, value) => {
+  afterGridUpdate() {
+    this._updateSummary();
+  }
+  _updateSummary() {
+    this.summary = _.reduce(this._gridData, (result, value) => {
       // exclude things that we do not have a quote for like bonds
       if (value.market_price) {
         result.total_cost += parseFloat(value.cost);
@@ -190,41 +128,19 @@ export class HoldingsListComponent implements OnInit {
       return result;
     }, { total_cost: 0, total_gain: 0 })
 
-    console.log(this.summary);
-
-    //TODO: show error indicators on network call failures & turn off load indicators
-    this.dataSource = new MatTableDataSource<Holding>(this._holdingsForDisplay)
-    if (this._hasViewLoaded) {
-      this.dataSource.sort = this.sort;
-    }
-    this._isLoading = false;
-
-    this.applyFilter(this.formModel.value.filter);
   }
-
-  applyFilter(filterValue: string) {
-    filterValue = filterValue.trim(); // Remove whitespace
-    filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-    this.dataSource.filter = filterValue;
+  private _getCagr(curPrice, costPrice, ageInYears) {
+    let cagr = Math.pow(new BigNumber(curPrice).div(costPrice).toNumber(), (1 / ageInYears)) - 1;
+    return new BigNumber(cagr.toPrecision(10));
   }
 
   getRowClasses(row) {
     return {
       'nafaa': (row.roi > 0.25) && (row.ageInYears > 0),
-      'nuksaan': row.gain_percent < -0.08
+      'nuksaan': row.gain_percent < -0.08,
+      'spec-row': true
     };
   }
-
-  private _getCagr(curPrice, costPrice, ageInYears) {
-    let cagr = Math.pow(new BigNumber(curPrice).div(costPrice).toNumber(), (1 / ageInYears)) - 1;
-    return new BigNumber(cagr.toPrecision(10));
-  }
-  private _currentFinYear(): number {
-    let today = new Date(Date.now());
-    let firstOfApril = Date.UTC(today.getFullYear(), 3, 1, 0, 0, 0, 0);
-    return (firstOfApril.valueOf() < today.valueOf()) ? today.getFullYear() : today.getFullYear() - 1;
-  }
-
 }
 export function getAgeBin(age_months) {
   if (age_months < 12) {

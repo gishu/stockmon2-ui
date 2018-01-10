@@ -7,6 +7,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
 import * as _ from 'lodash';
+import * as moment from 'moment';
 
 @Injectable()
 export class StockMonService {
@@ -25,11 +26,16 @@ export class StockMonService {
       { headers: new HttpHeaders().set('Accept', 'application/json') });
   }
 
-  getQuotesFor(stockSymbols) : Observable<any>{
+  getQuotesFor(stockSymbols): Observable<any> {
     let encodedSymbols = _.map(stockSymbols, encodeURIComponent);
     let queryParams = new HttpParams().set('symbol', _.join(encodedSymbols, ','));
-    
-    return this.http.get<any>(`${this.BASE_URL}nseProxy`, {params: queryParams});
+
+    return this.http.get<any>(`${this.BASE_URL}nseProxy`, { params: queryParams });
+  }
+
+  getGains(accountId, year): Observable<any> {
+    return this.http.get<any>(`${this.BASE_URL}accounts/${accountId}/snapshots/${year}/gains`,
+      { headers: new HttpHeaders().set('Accept', 'application/json') });
   }
 
   postTrades(accountId: number, csvPayload: string): Observable<any> {
@@ -62,11 +68,22 @@ interface JsonData {
   data: any;
 }
 
-export interface Holding{
-  date : string,
+export interface Holding {
+  date: string,
   stock: string,
-  qty : number,
-  price : number,
-  age_months : number,
-  notes : string,
+  qty: number,
+  price: number,
+  age_months: number,
+  notes: string,
+}
+
+export interface Gain {
+  date: string,
+  stock: string,
+  qty: number,
+  salePrice: number,
+  costPrice: number,
+  brokerage: number,
+  roi: number
+
 }
